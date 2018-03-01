@@ -1,20 +1,22 @@
 Import-Module ActiveDirectory
 
-
+#User prompt create new user
 $createuserprompt = Read-Host "create new user? type y or n " 
 
 if ($createuserprompt -eq 'y') {	
 	$username = Read-Host 'Enter first and last name'
-	$test = $username.split(" ")
+	$firstlast = $username.split(" ")
 	
 	
 	$office = Read-Host 'Enter office location' 
-	$firstname = $test[0]
-	$lastname = $test[1]
+	$firstname = $firstlast[0]
+	$lastname = $firstlast[1]
 	$firstname
 	$lastname
 	$email = Read-Host 'whats the email?'
 	$description = Read-Host 'whats the description?'
+	
+	#add new user, default email to rallyhealth domain 
 New-ADUser -Name $username -GivenName $username -Surname $username -AccountPassword(Read-Host -AsSecureString "AccountPassword") -PassThru | Enable-ADAccount
 	Get-ADUser $username | Foreach-Object{
 		Set-ADUser -Identity $_ -Email "$($email)@rallyhealth.com" 
@@ -24,6 +26,7 @@ New-ADUser -Name $username -GivenName $username -Surname $username -AccountPassw
 	
 	$currentuser = Get-ADUser -identity $username -property *
 	
+	#sets user attributes based on user input 
 	$UPN = $firstname + "." + $lastname
 	set-aduser -UserPrincipalName $UPN -Identity $currentuser
 	set-aduser -DisplayName $UPN -Identity $currentuser
@@ -37,16 +40,9 @@ else {
 }
 
 
-
-
-
-#create new user account and specify password
-#New-ADUser -Name "Phil Gibbins" -GivenName Phil -Surname Gibbins`
-#SamAccountName pgibbins -UserPrincipalName pgibbins@corp.contoso.com`
-#AccountPassword (Read-Host -AsSecureString "AccountPassword")
-#
 $askcat = Read-Host  'enter category?, type y or n'
 
+#puts user in appropriate category
 if ($askcat -eq 'y'){
 	$category = Read-Host 'pick a category, 1) real appeal transistion team 2) real appeal non-coaches 3)optum/ugh fte 4) standard full time 5) real appeal coaches 6) accenture eng 7) accenture uat 8) scalac' 
 
